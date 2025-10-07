@@ -291,7 +291,123 @@ q) Quitter";
                 {
                     if(valeurEntree == "p")
                     {
-                        //blablabla
+                        uint valeurDebut;
+                        uint valeurFin;
+
+                        while (true)
+                        {
+                            Console.WriteLine();
+                            Console.Write("Entrer un nombre de début :");
+                            string valeurDebutEntre = Console.ReadLine();
+                            bool nombreDeDebutEstValide = uint.TryParse(valeurDebutEntre, out uint valeurDeDebutConfirmer);
+
+                            if (nombreDeDebutEstValide && valeurDeDebutConfirmer > 0)
+                            {
+                                valeurDebut = valeurDeDebutConfirmer;
+                                break;
+                            }
+                            Console.WriteLine("Erreur : nombre de début invalide !");
+                        }
+
+                        while (true)
+                        {
+                            Console.WriteLine();
+                            Console.Write("Entrer un nombre de fin :");
+                            string valeurFinEntre = Console.ReadLine();
+                            bool nombreDeFinEstValide = uint.TryParse(valeurFinEntre, out uint valeurDeFinConfirmer);
+
+                            if (nombreDeFinEstValide)
+                            {
+                                valeurFin = valeurDeFinConfirmer;
+                                break;
+                            }
+                            Console.WriteLine("Erreur : nombre de Fin invalide !");
+                        }
+
+                        //commence a max(3, n), fait des bon de 2 -> n-1 : car si n % 2 == 0 -> pas premier et si on arrive pas en f ... != premier
+                        // pas de factuer premier VS % nombre impair ... 
+
+                        string nombrePremier = (valeurDebut <= 2) ? "2" : "";
+                        int nombreDeNombrePremier = (valeurDebut <=  2) ? 1: 0;
+
+                        for(int i = 1; i < valeurFin; i += 2)
+                        {
+
+                            if((i%3 != 0 &&  i % 5 != 0 && i % 7 != 0 && i % 9 != 0 && i >1) || i == 3 || i ==5 || i==7)
+                            {
+                                nombrePremier += $" {i}";
+                                nombreDeNombrePremier++;
+                            }
+                        }
+
+                        Console.WriteLine($"{nombreDeNombrePremier} nombres premiers de {valeurDebut} a {valeurFin} : ");
+                        Console.WriteLine(nombrePremier);
+                        Console.WriteLine();
+                        Console.Write("Appuyer sur Entrer pour continuer.");
+
+                    }
+                    else
+                    {
+                        double hauteur;
+                        double largeur;
+                        while (true)
+                        {
+                            Console.WriteLine();
+                            Console.Write("Entrer une hauteur : ");
+                            string hauteurEntre = Console.ReadLine();
+                            bool hauteurEstValide = double.TryParse(hauteurEntre, out double hauteurConfirmer);
+
+                            if (hauteurEstValide && hauteurConfirmer > 0)
+                            {
+                                hauteur = hauteurConfirmer;
+                                break;
+                            }
+                            Console.WriteLine("Erreur : hauteur invalide !");
+                        }
+
+                        if (valeurEntree == "r")
+                        {
+                            while (true)
+                            {
+                                Console.WriteLine();
+                                Console.Write("Entrer une largeur : ");
+                                string largeurEntre = Console.ReadLine();
+                                bool largeurEstValide = double.TryParse(largeurEntre, out double largeurConfirmer);
+
+                                if (largeurEstValide && largeurConfirmer > 0)
+                                {
+                                    largeur = largeurConfirmer;
+                                    break;
+                                }
+                                Console.WriteLine("Erreur : largeur invalide !");
+                            }
+
+                            for (int i = 0; i < Math.Round(hauteur); i++)
+                            {
+                                Console.WriteLine(string.Concat(Enumerable.Repeat("* ", (int)Math.Round(largeur))));
+                            }
+                            Console.WriteLine($"Aire      : {(largeur * hauteur):0.000}");
+                            Console.WriteLine($"Perimetre : {(2 * largeur + 2 * hauteur):0.000}");
+                            Console.WriteLine();
+                            Console.Write("Appuyer sur entrée pour continuer.");
+                            Console.ReadLine();
+                        }
+                        else
+                        {
+                            for (int i = 0; i < Math.Round(hauteur); i++)
+                            {
+                                Console.WriteLine(string.Concat(Enumerable.Repeat("* ", (i + 1))));
+                            }
+
+                            // ** = ^ ?
+                            double hypothenuse = Math.Sqrt((hauteur * hauteur) + (hauteur * hauteur));
+                            Console.WriteLine($"Aire        : {(hauteur * hauteur) / 2}");
+                            Console.WriteLine($"Hypothenuse : {hypothenuse:0.000}");
+                            Console.WriteLine($"Perimetre   : {(hauteur + hauteur + hypothenuse):0.000}");
+                            Console.WriteLine();
+                            Console.Write("Appuyer sur entrée pour continuer.");
+                            Console.ReadLine();
+                        }
                     }
                 }
                 
