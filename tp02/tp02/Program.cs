@@ -30,7 +30,7 @@ s) Série de Taylor
 
 r) Rectangle
 t) Triangle
-p) Nombres premiers (Bonus)
+p) Nombres premiers
 
 q) Quitter";
 
@@ -289,7 +289,7 @@ q) Quitter";
 
                 else if (estOpperationGraphique)
                 {
-                    if(valeurEntree == "p")
+                    if (valeurEntree == "p")
                     {
                         uint valeurDebut;
                         uint valeurFin;
@@ -324,26 +324,91 @@ q) Quitter";
                             Console.WriteLine("Erreur : nombre de Fin invalide !");
                         }
 
-                        //commence a max(3, n), fait des bon de 2 -> n-1 : car si n % 2 == 0 -> pas premier et si on arrive pas en f ... != premier
-                        // pas de factuer premier VS % nombre impair ... 
 
-                        string nombrePremier = (valeurDebut <= 2) ? "2" : "";
-                        int nombreDeNombrePremier = (valeurDebut <=  2) ? 1: 0;
-
-                        for(int i = 1; i < valeurFin; i += 2)
+                        //Si la n == 2 alors conteur de nombre premier++ et liste des nombre premier = '2' car mon algorithme saute les nombres pairs car aucun nombre pair,hormis 2, est premier
+                        string nombrePremier = "";
+                        int nombreDeNombrePremier = 0;
+                        
+                        //Utilisation d'une crible d'Eresthor pour les grandes valeurs pour e.g 1_000_000
+                        if (valeurFin >= 1000000)
                         {
 
-                            if((i%3 != 0 &&  i % 5 != 0 && i % 7 != 0 && i % 9 != 0 && i >1) || i == 3 || i ==5 || i==7)
+                            bool[] estPremier = Enumerable.Repeat(true, (int)valeurFin + 1).ToArray();
+
+                            estPremier[0] = false;
+                            estPremier[1] = false;
+                            uint limit = (uint)Math.Sqrt(valeurFin);
+
+                            for (uint p = 2; p < limit + 1; p++)
                             {
-                                nombrePremier += $" {i}";
-                                nombreDeNombrePremier++;
+                                if (estPremier[p])
+                                {
+                                    for (uint multipleDeP = p * p; multipleDeP < valeurFin + 1; multipleDeP += p)
+                                    {
+                                        estPremier[multipleDeP] = false;
+                                    }
+                                }
+                            }
+
+                            for (uint i = 0; i <= valeurFin; i++)
+                            {
+                                if (estPremier[i] && i >= valeurDebut)
+                                {
+                                    nombreDeNombrePremier++;
+                                    nombrePremier += $"{i} ";
+                                }
                             }
                         }
+
+
+                        else
+                        {
+                            nombrePremier = (valeurDebut <= 2) ? "2" : "";
+                            nombreDeNombrePremier = (valeurDebut <= 2) ? 1 : 0;
+                            
+
+                            if (valeurDebut <= 2)
+                            {
+                                nombrePremier = "2";
+                                nombreDeNombrePremier = 1;
+                            }
+
+                            uint pointDeDepart = (valeurDebut <= 2) ? 3 : (valeurDebut % 2 == 0 ? valeurDebut + 1 : valeurDebut);
+
+                            for (uint i = pointDeDepart; i <= valeurFin; i += 2)
+                            {
+                                bool estPremier = true;
+
+                                // On ne teste que les diviseurs impairs >= 3 jusqu'à sqrt(i)
+                                uint limite = (uint)Math.Sqrt(i);
+                                for (uint j = 3; j <= limite; j += 2)
+                                {
+                                    if (i % j == 0)
+                                    {
+                                        estPremier = false;
+                                        break;
+                                    }
+                                }
+
+                                if (estPremier)
+                                {
+                                    nombreDeNombrePremier++;
+                                    nombrePremier += $" {i}";
+                                }
+                            }
+
+
+                        }
+
+
+
+
 
                         Console.WriteLine($"{nombreDeNombrePremier} nombres premiers de {valeurDebut} a {valeurFin} : ");
                         Console.WriteLine(nombrePremier);
                         Console.WriteLine();
-                        Console.Write("Appuyer sur Entrer pour continuer.");
+                        Console.Write("Appuyer sur Entrer pour continuer.\n");
+                        Console.ReadLine();
 
                     }
                     else
@@ -416,6 +481,8 @@ q) Quitter";
 
         static double factorielPourSerieDeTaylor(int x)
         {
+
+            
             double factorielDeX = 1;
 
             for(int i = x; i > 0; i--)
