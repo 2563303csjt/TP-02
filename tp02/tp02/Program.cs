@@ -329,7 +329,8 @@ q) Quitter";
                         string nombrePremier = "";
                         int nombreDeNombrePremier = 0;
                         
-                        //Utilisation d'une crible d'Eresthor pour les grandes valeurs pour e.g 1_000_000
+                        //Utilisation d'une crible d'Eresthor pour les grandes valeurs pour e.g 1_000_000 
+                        
                         if (valeurFin >= 1000000)
                         {
 
@@ -369,7 +370,7 @@ q) Quitter";
 
                             if (valeurDebut <= 2)
                             {
-                                nombrePremier = "2";
+                                nombrePremier = "2 ";
                                 nombreDeNombrePremier = 1;
                             }
 
@@ -393,7 +394,8 @@ q) Quitter";
                                 if (estPremier)
                                 {
                                     nombreDeNombrePremier++;
-                                    nombrePremier += $" {i}";
+                                    string nombrePremierAjouterALaffichage = (nombreDeNombrePremier > 0 && nombreDeNombrePremier%6 == 0) ? $" {i}\n" : $"{i} ";
+                                    nombrePremier += nombrePremierAjouterALaffichage;
                                 }
                             }
 
