@@ -1,25 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-//stirling approx factor pas Z
-//FN de input
 
 namespace tp02
 {
     internal class Program
     {
-        static void Main(string[] args)
-        {
 
-            bool quitterLaCalculatrice = false;
-            double resultat = 0;
-            string opperationAffichee = "";
 
-            string tableDesOpperations = @"+) Addition
+
+        const string OPTION_QUITTER = "q";
+        const string OPTION_ADDITION = "+";
+        const string OPTION_SOUSTRACTION = "-";
+        const string OPTION_MULTIPLICATION = "*";
+        const string OPTION_DIVISION = "/";
+        const string OPTION_FACT = "!";
+        const string OPTION_SERIE_TAYLOR = "s";
+        const string OPTION_RECTANGLE = "r";
+        const string OPTION_TRIANGLE = "t";
+        const string OPTION_NOMBRES_PREMIERS = "p";
+        const string OPTION_EXPOSANT = "^";
+        const string TABLE_OPERATIONS = @"+) Addition
 -) Soustraction
 *) Multiplication
 /) Division
@@ -34,434 +37,338 @@ p) Nombres premiers
 
 q) Quitter";
 
-            while (!quitterLaCalculatrice)
-            {
+        static void Main(string[] args)
+        {
+            bool quitterCalculatrice = false;
+            double resultat = 0;
+            string operationAffichee = "";
 
+            while (!quitterCalculatrice)
+            {
                 Console.WriteLine("**************************************************");
                 Console.WriteLine("*                  CALCULATRICE                  *");
                 Console.WriteLine("**************************************************");
-                Console.WriteLine((opperationAffichee != "") ? opperationAffichee : "");
-                Console.WriteLine($"Resultat : {resultat}");
+                Console.WriteLine((operationAffichee != "") ? operationAffichee : "");
+                Console.WriteLine($"Résultat : {resultat}");
                 Console.WriteLine();
                 Console.WriteLine("--- Opérations ---");
                 Console.WriteLine();
-                Console.WriteLine(tableDesOpperations);
+                Console.WriteLine(TABLE_OPERATIONS);
                 Console.WriteLine();
-                Console.Write("Choisir une opération : ");
+                bool operationEstValide = false;
+                string valeurEntree = "";
+                while (!operationEstValide)
+                {
+                    //
+                    Console.Write("\nChoisir une opération : ");
+                    valeurEntree = Console.ReadLine();
 
+                    if(double.TryParse(valeurEntree, out double nouveauResultat))
+                    {
+                        resultat = nouveauResultat;
+                        operationAffichee = "";
+                        break;
+                    }
 
-                string valeurEntree = Console.ReadLine();
+                    if (valeurEntree == OPTION_QUITTER ||
+                        valeurEntree == OPTION_ADDITION ||
+                        valeurEntree == OPTION_SOUSTRACTION ||
+                        valeurEntree == OPTION_MULTIPLICATION ||
+                        valeurEntree == OPTION_DIVISION ||
+                        valeurEntree == OPTION_FACT ||
+                        valeurEntree == OPTION_SERIE_TAYLOR ||
+                        valeurEntree == OPTION_RECTANGLE ||
+                        valeurEntree == OPTION_TRIANGLE ||
+                        valeurEntree == OPTION_NOMBRES_PREMIERS ||
+                        valeurEntree == OPTION_EXPOSANT) break;
+                   
+                        Console.WriteLine("Erreur : l'opération est invalide.");
+
+                }
+                
                 bool parseEstUnChiffre = double.TryParse(valeurEntree, out double resultatDuParse);
 
-                if (parseEstUnChiffre)
-                {
-                    resultat = resultatDuParse;
-                    continue;
-                }
 
-                //Nous pouvons directement faire un if/else sur la valeur entre car nous savons quelle nest pas numerique.
-                //Nous faisons un if/else et nom un switch car il y a 3 type d opperation : simple(sans calcule) complexe(avec caluclu) e.g Factoriel et celles avec affichage e.g rectangle
+                bool estOperationSimple = valeurEntree == OPTION_ADDITION || valeurEntree == OPTION_SOUSTRACTION || valeurEntree == OPTION_DIVISION || valeurEntree == OPTION_MULTIPLICATION;
+                bool estOperationComplexe = valeurEntree == OPTION_FACT || valeurEntree == OPTION_SERIE_TAYLOR;
+                bool estOperationGraphique = valeurEntree == OPTION_RECTANGLE || valeurEntree == OPTION_TRIANGLE || valeurEntree == OPTION_NOMBRES_PREMIERS;
 
-
-                bool estOpperationSimple = valeurEntree == "+" || valeurEntree == "-" || valeurEntree == "/" || valeurEntree == "*";
-                bool estOpperationComplexe = valeurEntree == "!" || valeurEntree == "s";
-                bool estOpperationGraphique = valeurEntree == "r" || valeurEntree == "t" || valeurEntree == "p";
-
-                if (valeurEntree == "q")
+                if (valeurEntree == OPTION_QUITTER)
                 {
                     Console.WriteLine();
-                    Console.Write("Appuyer sur entrée pour fermer la calculatrice.");
+                    Console.Write("Appuyer sur Entrée pour fermer la calculatrice.");
                     Console.ReadLine();
-                    quitterLaCalculatrice = true;
-
-                }else if(valeurEntree == "^")
+                    quitterCalculatrice = true;
+                }
+                else if (valeurEntree == OPTION_EXPOSANT)
                 {
-
-
-                    int exposantConfirmer = ParseEntierSecuritairemen("Entrer l'exposant : ", "Erreur : exposant n'est pas entier !");
-
-                    opperationAffichee = $"Operation : {resultat} ^ {exposantConfirmer} = ";
+                    int exposant = ParseEntierSecuritaire("Entrer l'exposant : ", "Erreur : exposant non valide !");
+                    operationAffichee = $"Opération : {resultat} ^ {exposant} = ";
                     string calcul = "\n\nCalculs :\n";
-                    double resultatDeLexposant = resultat;
+                    double resultatExposant = resultat;
 
-                    if(exposantConfirmer < 0)
+                    if (exposant < 0)
                     {
-                        double demonimateur = resultat;
-                        resultatDeLexposant = 1 / resultatDeLexposant;
-                        for (int i = 1; i < -exposantConfirmer; i++)
+                        double denominateur = resultat;
+                        resultatExposant = 1 / resultatExposant;
+                        for (int i = 1; i < -exposant; i++)
                         {
-                            calcul += $"1/{demonimateur} * 1/{resultat} = ";
-                            resultatDeLexposant *= 1/resultat;
-                            demonimateur *= resultat;
-                            calcul += $"1/{demonimateur}\n";
+                            calcul += $"1/{denominateur} * 1/{resultat} = ";
+                            resultatExposant *= 1 / resultat;
+                            denominateur *= resultat;
+                            calcul += $"1/{denominateur}\n";
                         }
-
-                        opperationAffichee += resultatDeLexposant;
-                        resultat = resultatDeLexposant;
-                        opperationAffichee += calcul;
+                        operationAffichee += resultatExposant;
+                        resultat = resultatExposant;
+                        operationAffichee += calcul;
                     }
-                    else if(exposantConfirmer > 0)
+                    else if (exposant > 0)
                     {
-                        for(int i = 1; i < exposantConfirmer; i++)
+                        for (int i = 1; i < exposant; i++)
                         {
-                            calcul += $"{resultatDeLexposant} * {resultat} = ";
-                            resultatDeLexposant *= resultat;
-                            calcul += $"{resultatDeLexposant}\n";
+                            calcul += $"{resultatExposant} * {resultat} = ";
+                            resultatExposant *= resultat;
+                            calcul += $"{resultatExposant}\n";
                         }
-
-                        opperationAffichee += resultatDeLexposant;
-                        resultat = resultatDeLexposant;
-                        opperationAffichee += calcul;
+                        operationAffichee += resultatExposant;
+                        resultat = resultatExposant;
+                        operationAffichee += calcul;
                     }
                     else
                     {
-                        opperationAffichee = $"{resultat} ^ 0 = 1";
+                        operationAffichee = $"{resultat} ^ 0 = 1";
                         resultat = 1;
                     }
-                    
                 }
-
-
-
-                else if (estOpperationSimple)
+                else if (estOperationSimple)
                 {
-
-                    double nombreEntreConfirmer = ParseDoubleSecuritairement("Entrer un nombre : ", "Erreur : nombre invalide!");
-                    Console.WriteLine(nombreEntreConfirmer);
+                    double nombre = ParseDoubleSecuritaire("Entrer un nombre : ", "Erreur : nombre invalide !");
+                    Console.WriteLine(nombre);
 
                     switch (valeurEntree)
                     {
-                        case "+":
-                            opperationAffichee = $"\nOperation : {resultat} + {nombreEntreConfirmer} = {resultat + nombreEntreConfirmer}\n";
-                            resultat += nombreEntreConfirmer;
+                        case OPTION_ADDITION:
+                            operationAffichee = $"\nOpération : {resultat} + {nombre} = {resultat + nombre}\n";
+                            resultat += nombre;
                             break;
-                        case "-":
-                            opperationAffichee = $"\nOperation : {resultat} - {nombreEntreConfirmer} = {resultat - nombreEntreConfirmer}\n";
-                            resultat -= nombreEntreConfirmer;
+                        case OPTION_SOUSTRACTION:
+                            operationAffichee = $"\nOpération : {resultat} - {nombre} = {resultat - nombre}\n";
+                            resultat -= nombre;
                             break;
-                        case "*":
-                            opperationAffichee = $"\nOperation : {resultat} * {nombreEntreConfirmer} = {resultat * nombreEntreConfirmer}\n";
-                            resultat *= nombreEntreConfirmer;
+                        case OPTION_MULTIPLICATION:
+                            operationAffichee = $"\nOpération : {resultat} * {nombre} = {resultat * nombre}\n";
+                            resultat *= nombre;
                             break;
-                        case "/":
-                            if (nombreEntreConfirmer != 0)
+                        case OPTION_DIVISION:
+                            if (nombre != 0)
                             {
-                                opperationAffichee = $"\nOperation : {resultat} / {nombreEntreConfirmer} = {resultat / nombreEntreConfirmer}\n";
-                                resultat /= nombreEntreConfirmer;
-
+                                operationAffichee = $"\nOpération : {resultat} / {nombre} = {resultat / nombre}\n";
+                                resultat /= nombre;
                             }
                             else
                             {
-                                opperationAffichee = "\nOpération annulée : impossible de diviser par 0 !";
+                                operationAffichee = "\nOpération annulée : division par 0 impossible !";
                             }
-                                break;
-
-                        default:
-                            Console.WriteLine(valeurEntree);
                             break;
-
                     }
-                    
                 }
-
-                else if (estOpperationComplexe)
+                else if (estOperationComplexe)
                 {
-                    if (valeurEntree == "!")
+                    if (valeurEntree == OPTION_FACT)
                     {
-
-
-                        uint nombreConfirmer = ParseEntierPositif("Entrer le factoriel : ", "Erreur : factoriel n'est pas entier positif !");
-                        if (nombreConfirmer > 0)
+                        uint nombre = ParseEntierPositif("Entrer le factoriel : ", "Erreur : factoriel non valide !");
+                        if (nombre > 0)
                         {
                             string calcul = "Calculs : \n";
-                            long factorielDeN = 1;
-                            for (long i = nombreConfirmer; i > 0; i--)
+                            long factoriel = 1;
+                            for (long i = nombre; i > 0; i--)
                             {
-                                calcul += $"{factorielDeN} * {i} = ";
-                                factorielDeN *= i;
-                                calcul += $"{factorielDeN}\n";
+                                calcul += $"{factoriel} * {i} = ";
+                                factoriel *= i;
+                                calcul += $"{factoriel}\n";
                             }
-
-                            opperationAffichee = $"\nOperation : {nombreConfirmer}! = {factorielDeN}\n\n{calcul}";
-                            resultat = factorielDeN;
-
-
-                        } else
+                            operationAffichee = $"\nOpération : {nombre}! = {factoriel}\n\n{calcul}";
+                            resultat = factoriel;
+                        }
+                        else
                         {
                             resultat = 1;
-                            opperationAffichee = "\nOperation : 0! = 1";
-
+                            operationAffichee = "\nOpération : 0! = 1";
                         }
-
                     }
-
-                    else
+                    else // Série de Taylor
                     {
+                        double xSerie = ParseDoubleSecuritaire("Entrer le x de la série de Taylor : ", "Erreur : x invalide !");
+                        uint nSerie = ParseEntierPositif("Entrer le n de la série de Taylor : ", "Erreur : n invalide !");
+                        double resultatSerie = 1;
 
-                        double xDeLaSerie = ParseDoubleSecuritairement("Entrer le x de la série de Taylor :", "Erreur : x invalide !  ");
+                        string serieAff = "Série de Taylor : 1";
+                        string calculAff = "Calculs : 1";
+                        string valeursAff = "Valeurs : 1";
 
-  
-
-                        uint nDeLaSerieDeTaylor = ParseEntierPositif("Entrer le n de la série de Taylor : ", "Erreur : n invalide, doit être un nombre entier !");
-                            
-
-                        double resultatDeLaSerie = 1;
-
-                        string serieDeTaylorAff = "Serie de Taylor : 1";
-                        string calculSerieAff = "Calculs : 1";
-                        string valeurAff = "Valeurs : 1";
-
-                        for (int i = 1; i <= nDeLaSerieDeTaylor; i++)
+                        for (int i = 1; i <= nSerie; i++)
                         {
-                            serieDeTaylorAff += $" + ({xDeLaSerie}^{i} / {i}!)";
+                            serieAff += $" + ({xSerie}^{i} / {i}!)";
 
-                            double exposantValeur = Exposant(xDeLaSerie, i);
-                            double factorielValeur = factorielPourSerieDeTaylor(i);
+                            double exposantVal = Exposant(xSerie, i);
+                            double factorielVal = FactorielPourSerie(i);
 
-                            calculSerieAff += $" + {exposantValeur:0.###} / {factorielValeur:0.###}";
-                            double termeIDeLaSerie = (exposantValeur / factorielValeur);
-                            resultatDeLaSerie += termeIDeLaSerie;
-
-                            valeurAff += $" + {termeIDeLaSerie:0.###}";
+                            calculAff += $" + {exposantVal:0.###} / {factorielVal:0.###}";
+                            double terme = exposantVal / factorielVal;
+                            resultatSerie += terme;
+                            valeursAff += $" + {terme:0.###}";
                         }
-                        resultat = resultatDeLaSerie;
-                        opperationAffichee = $"\n{serieDeTaylorAff}\n{calculSerieAff}\n{valeurAff}\n";
-
+                        resultat = resultatSerie;
+                        operationAffichee = $"\n{serieAff}\n{calculAff}\n{valeursAff}\n";
                     }
                 }
-
-                else if (estOpperationGraphique)
+                else if (estOperationGraphique)
                 {
-                    if (valeurEntree == "p")
+                    if (valeurEntree == OPTION_NOMBRES_PREMIERS)
                     {
-                        //initialize au valeur minimale pour raisons de securite.
-                        uint valeurDebut = ParseEntierPositif("Entrer un nombre de début :", "Erreur : nombre de début invalide !");
-                        uint valeurFin = ParseEntierSuperieurAX("Entrer un nombre de fin :", "Erreur : nombre de début invalide !", valeurDebut);
+                        uint debut = ParseEntierPositif("Entrer un nombre de début : ", "Erreur : début invalide !");
+                        uint fin = ParseEntierSuperieurAX("Entrer un nombre de fin : ", "Erreur : fin invalide !", debut);
 
-                        string nombrePremier = "";
-                        int nombreDeNombrePremier = 0;
-                        
-                        //Utilisation d'une Crible D'Eresthor modifier pour calculer et afficher les nombre premier dans l'intervale [a;b]
+                        string nombresPremiers = "";
+                        int compteurPremiers = 0;
 
-                        bool[] estPremier = Enumerable.Repeat(true, (int)valeurFin + 1).ToArray();
-
+                        bool[] estPremier = Enumerable.Repeat(true, (int)fin + 1).ToArray();
                         estPremier[0] = false;
                         estPremier[1] = false;
-                        uint limit = (uint)Math.Sqrt(valeurFin);
+                        uint limite = (uint)Math.Sqrt(fin);
 
-                        for (uint p = 2; p < limit + 1; p++)
+                        for (uint p = 2; p <= limite; p++)
                         {
                             if (estPremier[p])
                             {
-                                for (uint multipleDeP = p * p; multipleDeP < valeurFin + 1; multipleDeP += p)
+                                for (uint multiple = p * p; multiple <= fin; multiple += p)
                                 {
-                                    estPremier[multipleDeP] = false;
+                                    estPremier[multiple] = false;
                                 }
                             }
                         }
 
-                        for (uint i = 0; i <= valeurFin; i++)
+                        for (uint i = 0; i <= fin; i++)
                         {
-                            if (estPremier[i] && i >= valeurDebut)
+                            if (estPremier[i] && i >= debut)
                             {
-                                nombreDeNombrePremier++;
-                                nombrePremier += (nombreDeNombrePremier%7==0 && nombreDeNombrePremier > 0) ? $"{i}\n" : $"{i} ";
+                                compteurPremiers++;
+                                nombresPremiers += (compteurPremiers % 7 == 0) ? $"{i}\n" : $"{i} ";
                             }
                         }
 
-                        Console.WriteLine($"{nombreDeNombrePremier} nombres premiers de {valeurDebut} a {valeurFin} : \n");
-                        Console.WriteLine(nombrePremier);
+                        Console.WriteLine($"{compteurPremiers} nombres premiers de {debut} à {fin} : \n");
+                        Console.WriteLine(nombresPremiers);
                         Console.WriteLine();
-                        Console.Write("Appuyer sur Entrer pour continuer.\n");
+                        Console.Write("Appuyer sur Entrée pour continuer.\n");
                         Console.ReadLine();
-
                     }
                     else
                     {
                         double hauteur = ParseDoubleSuperieureAZero("Entrer une hauteur : ", "Erreur : hauteur invalide !");
-                        
-                        if (valeurEntree == "r")
+
+                        if (valeurEntree == OPTION_RECTANGLE)
                         {
-
                             double largeur = ParseDoubleSuperieureAZero("Entrer une largeur : ", "Erreur : largeur invalide !");
-
 
                             for (int i = 0; i < Math.Ceiling(hauteur); i++)
                             {
                                 Console.WriteLine(string.Concat(Enumerable.Repeat("* ", (int)Math.Ceiling(largeur))));
                             }
                             Console.WriteLine($"Aire      : {(largeur * hauteur):0.000}");
-                            Console.WriteLine($"Perimetre : {(2 * largeur + 2 * hauteur):0.000}");
+                            Console.WriteLine($"Périmètre : {(2 * largeur + 2 * hauteur):0.000}");
                             Console.WriteLine();
                             Console.Write("Appuyer sur entrée pour continuer.");
                             Console.ReadLine();
                         }
-                        else
+                        else // Triangle
                         {
                             for (int i = 0; i < Math.Round(hauteur); i++)
                             {
                                 Console.WriteLine(string.Concat(Enumerable.Repeat("* ", (i + 1))));
                             }
-
                             double hypothenuse = Math.Sqrt((hauteur * hauteur) + (hauteur * hauteur));
                             Console.WriteLine($"Aire        : {((hauteur * hauteur) / 2):0.###}");
-                            Console.WriteLine($"Hypothenuse : {hypothenuse:0.###}");
-                            Console.WriteLine($"Perimetre   : {(hauteur + hauteur + hypothenuse):0.###}");
+                            Console.WriteLine($"Hypoténuse : {hypothenuse:0.###}");
+                            Console.WriteLine($"Périmètre   : {(hauteur + hauteur + hypothenuse):0.###}");
                             Console.WriteLine();
                             Console.Write("Appuyer sur entrée pour continuer.");
                             Console.ReadLine();
                         }
                     }
                 }
-                
+
             }
         }
 
-        static double factorielPourSerieDeTaylor(int x)
+        static double FactorielPourSerie(int x)
         {
-            double factorielDeX = 1;
-
-            for(int i = x; i > 0; i--)
-            {
-                factorielDeX *= i;
-            }
-
-            return factorielDeX;
+            double resultat = 1;
+            for (int i = x; i > 0; i--) resultat *= i;
+            return resultat;
         }
+
         static double Exposant(double x, int n)
         {
-            double resultatDeLexposant = 1;
-
-            for(int i = 0; i < n; i++)
-            {
-                resultatDeLexposant *= x;
-            }
-
-            return resultatDeLexposant;
+            double resultat = 1;
+            for (int i = 0; i < n; i++) resultat *= x;
+            return resultat;
         }
 
-        static double ParseDoubleSecuritairement(string question, string messageErreur)
+        static double ParseDoubleSecuritaire(string question, string messageErreur)
         {
-            bool valeurEntrerEstValide = false;
-
-            while (!valeurEntrerEstValide)
+            bool valide = false;
+            while (!valide)
             {
                 Console.Write($"\n{question}");
-                string valeurEntree = Console.ReadLine();
-
-                valeurEntrerEstValide = double.TryParse(valeurEntree, out double doubleValide);
-
-                if (valeurEntrerEstValide)
-                {   
-                    return doubleValide;
-                }
-
-                Console.WriteLine(messageErreur); ;
+                string entree = Console.ReadLine();
+                valide = double.TryParse(entree, out double resultat);
+                if (valide) return resultat;
+                Console.WriteLine(messageErreur);
             }
-
             return 0.0;
         }
 
         static uint ParseEntierPositif(string question, string messageErreur)
         {
-            bool nombreEntrerEstValide = false;
-
-            while (!nombreEntrerEstValide)
+            while (true)
             {
                 Console.Write($"\n{question}");
-                string valeurEntree = Console.ReadLine();
-
-                //Nombre entier est Entier et Positif
-                if(uint.TryParse(valeurEntree, out uint entierPositifValide))
-                {
-                    return entierPositifValide;
-                }
-
-                //Cas Erreur
-
-                //Valeur n'est pas un entier positif
-                if(double.TryParse(valeurEntree, out double nombreDecimal))
-                {
-                    Console.WriteLine(messageErreur);
-                }
-                //si la valeur entree n'est pas numérique.
-                else
-                {
-                    Console.WriteLine("Erreur : nombre invalide!");
-                }
-
-
+                string entree = Console.ReadLine();
+                if (uint.TryParse(entree, out uint resultat)) return resultat;
+                Console.WriteLine(messageErreur);
             }
-
-            return 0;
         }
 
         static double ParseDoubleSuperieureAZero(string question, string messageErreur)
         {
-            bool valeurEstValide = false;
-
-            while (!valeurEstValide)
+            while (true)
             {
-                double valeurEntre = ParseDoubleSecuritairement(question, messageErreur);
-
-                if(valeurEntre > 0)
-                {
-                    valeurEstValide = true;
-                    return valeurEntre;
-                }
-
+                double valeur = ParseDoubleSecuritaire(question, messageErreur);
+                if (valeur > 0) return valeur;
                 Console.WriteLine(messageErreur);
             }
-
-            return 1;
         }
 
-        static int ParseEntierSecuritairemen(string question, string messageErreur)
+        static int ParseEntierSecuritaire(string question, string messageErreur)
         {
-            bool nombreEntrerEstValide = false;
-            while (!nombreEntrerEstValide) 
+            while (true)
             {
                 Console.Write($"{question}");
-                string valeurEntree = Console.ReadLine();
-
-                if (int.TryParse(valeurEntree, out int entierValide))
-                {
-                    nombreEntrerEstValide = true;
-                    return entierValide;
-                }
-
-                if(double.TryParse(valeurEntree, out double foo))
-                {
-                    Console.WriteLine(messageErreur);
-                }
-                else
-                {
-                    Console.WriteLine("Erreur : nombre invalide!");
-                }
-
+                string entree = Console.ReadLine();
+                if (int.TryParse(entree, out int resultat)) return resultat;
+                Console.WriteLine(messageErreur);
             }
-
-            return 0;
         }
 
         static uint ParseEntierSuperieurAX(string question, string messageErreur, uint x)
         {
-            bool valeurEntreeEstValide = false;
-
-            while (!valeurEntreeEstValide)
+            while (true)
             {
-                uint valeurEntre = ParseEntierPositif(question, messageErreur);
-
-                if(valeurEntre >= x)
-                {
-                    valeurEntreeEstValide = true;
-                    return valeurEntre;
-                }
-
+                uint valeur = ParseEntierPositif(question, messageErreur);
+                if (valeur >= x) return valeur;
                 Console.WriteLine(messageErreur);
             }
-
-            return x + 1;
         }
     }
 }
