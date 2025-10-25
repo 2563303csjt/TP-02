@@ -387,21 +387,31 @@ q) Quitter";
 
         static double ParseDoubleSuperieureAZero(string question, string messageErreur)
         {
-            while (true)
+            bool valide = false;
+            while (!valide)
             {
                 double valeur = ParseDoubleSecuritaire(question, messageErreur);
-                if (valeur > 0) return valeur;
+                if (valeur > 0)
+                {
+                    valide = true;
+                    return valeur;
+                }
                 Console.WriteLine(messageErreur);
             }
         }
 
         static int ParseEntierSecuritaire(string question, string messageErreur)
         {
-            while (true)
+            bool valide = false;
+            while (!valide)
             {
                 Console.Write($"{question}");
                 string entree = Console.ReadLine();
-                if (int.TryParse(entree, out int resultat)) return resultat;
+                if (int.TryParse(entree, out int resultat))
+                {
+                    valide = true;
+                    return resultat;
+                }
                 Console.WriteLine(messageErreur);
             }
         }
@@ -409,8 +419,9 @@ q) Quitter";
         // Parse un entier positif supérieur ou égal à X.
         // Cette fonction est utilisée pour le calcul des nombres premiers et pour toute entrée nécessitant un uint ≥ 0.
         static uint ParseEntierSuperieurOuEgaleAX(string question, string messageErreur, uint x)
-        {
-            while (true)
+        {   
+            bool valide = false
+            while (!valide)
             {
                 Console.Write($"\n{question}");
                 string entree = Console.ReadLine();
@@ -419,6 +430,7 @@ q) Quitter";
                 {
                     if (valeur >= x)
                     {
+                        valide = true;
                         return valeur;
                     }
                 }
