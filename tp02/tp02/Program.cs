@@ -19,6 +19,8 @@ namespace tp02
     {
 
         // Déclaration des constantes utilisées pour identifier les opérations
+
+        const int LARGEUR_MAXIMAL_DE_LA_CONSOLE = 50;
         const string OPTION_QUITTER = "q";
         const string OPTION_ADDITION = "+";
         const string OPTION_SOUSTRACTION = "-";
@@ -30,7 +32,7 @@ namespace tp02
         const string OPTION_TRIANGLE = "t";
         const string OPTION_NOMBRES_PREMIERS = "p";
         const string OPTION_EXPOSANT = "^";
-
+        // 99881  99901  99907  99923  99929  99961  99971
         // Menu principal affiché à l’écran
         const string TABLE_OPERATIONS = @"+) Addition
 -) Soustraction
@@ -49,20 +51,27 @@ q) Quitter";
 
         static void Main(string[] args)
         {
+            
             // Variable qui contrôle la boucle principale
             bool quitterCalculatrice = false;
             // Résultat courant affiché dans le menu
             double resultat = 0;
             // Chaîne utilisée pour afficher la dernière opération effectuée
+
             string operationAffichee = "";
+            string etoiles = new string('*', LARGEUR_MAXIMAL_DE_LA_CONSOLE);
+            string calculatriceEnMaj = "CALCULATRICE";
+            int nombreDespacesAvantMotCalculatrice = (LARGEUR_MAXIMAL_DE_LA_CONSOLE - calculatriceEnMaj.Length - 1)/2;
+            string espaceDePaddingPourLeMotCalculatrice = new string(' ', nombreDespacesAvantMotCalculatrice);
 
             // Boucle principale du programme : affiche le menu tant que l’utilisateur ne quitte pas
             while (!quitterCalculatrice)
             {
                 // Affichage de l’en-tête et du menu
-                Console.WriteLine("**************************************************");
-                Console.WriteLine("*                  CALCULATRICE                  *");
-                Console.WriteLine("**************************************************");
+                
+                Console.WriteLine(etoiles);
+                Console.WriteLine('*' + espaceDePaddingPourLeMotCalculatrice+ calculatriceEnMaj + espaceDePaddingPourLeMotCalculatrice + '*');
+                Console.WriteLine(etoiles);
                 Console.WriteLine((operationAffichee != "") ? operationAffichee : "");
                 Console.WriteLine($"Résultat : {resultat}");
                 Console.WriteLine();
@@ -176,7 +185,6 @@ q) Quitter";
                 else if (estOperationSimple)
                 {
                     double nombre = ParseDoubleSecuritaire("Entrer un nombre : ", "Erreur : nombre invalide !");
-                    Console.WriteLine(nombre);
 
                     switch (valeurEntree)
                     {
@@ -204,7 +212,7 @@ q) Quitter";
                             }
                             else
                             {
-                                operationAffichee = "\nOpération annulée : division par 0 impossible !";
+                                operationAffichee = "\nOpération annulée : division par 0 impossible !\n";
                             }
                             break;
                     }
@@ -216,7 +224,7 @@ q) Quitter";
                     // ----- FACTORIEL -----
                     if (valeurEntree == OPTION_FACT)
                     {
-                        uint nombre = ParseEntierSuperieurOuEgaleAX("Entrer le factoriel : ", "Erreur : factoriel non valide !", 0);
+                        uint nombre = ParseEntierSuperieurOuEgaleAX("Entrer le factoriel : ", "Erreur : le factoriel doit être un entier positif !", 0);
                         if (nombre > 0)
                         {
                             string calcul = "Calculs : \n";
@@ -277,6 +285,9 @@ q) Quitter";
                         string nombresPremiers = "";
                         int compteurPremiers = 0;
 
+                        //Initialise un tableau de boolean representant si le nombre est premier, au début,les entier sont tous considérés comme premier, l'etat sera modifier par l'algorithme.
+                        //Crée n+1 elemement, commme cela, chaque entier <= MAXIMUM a un index equivalent dans l'array.
+
                         bool[] estPremier = Enumerable.Repeat(true, (int)fin + 1).ToArray();
                         estPremier[0] = false;
                         estPremier[1] = false;
@@ -287,6 +298,8 @@ q) Quitter";
                         {
                             if (estPremier[p])
                             {
+                                //commence a p^2,car p*x | x<p  est déjà un multiple enlevé.
+
                                 for (uint multiple = p * p; multiple <= fin; multiple += p)
                                 {
                                     estPremier[multiple] = false;
@@ -295,15 +308,56 @@ q) Quitter";
                         }
 
                         // Affiche les nombres premiers trouvés
+                        int plusGrandNombrePremier = 0;
+
+                        for(int i = estPremier.Length - 1; i >= 0; i--)
+                        {
+                            if (estPremier[i])
+                            {
+                                plusGrandNombrePremier = i;
+                                break;
+                            }
+                        }
+
+                        int espaceMinimal = 2;
+                        int espaceDeBalancement = 1;
+
+                        int largeurMaximumParNombre = plusGrandNombrePremier.ToString().Length;
+                        int charParNombre = largeurMaximumParNombre + espaceMinimal;
+
+                        //Double pour avoir un double comme reponse et donc que le floor soit utile.
+                        int nombresParLigne = (int)Math.Floor(LARGEUR_MAXIMAL_DE_LA_CONSOLE / (double)charParNombre);
+                        
+
                         for (uint i = 0; i <= fin; i++)
                         {
                             if (estPremier[i] && i >= debut)
                             {
+
+                                string nombreFormate = "";
+                                //Saute une ligne au pour la premiere ligne pour l'esthetique et saute une ligne quand le nombre d'element maximum par ligne est atteint.
+                                if (compteurPremiers % nombresParLigne == 0)
+                                {
+                                    nombresPremiers += "\n";
+                                }
+                                //On ajoute un espace, car le nombre n'est pas le premier de sa ligne
+                                else
+                                {
+                                    nombreFormate += " ";   
+                                }
+
+                                //enleve l'espace de balancement pour compense pour l'espace ajouter en haut, 
+                                int nombreDEspace = charParNombre - i.ToString().Length - espaceDeBalancement;
+
+                                string espaceAAjouter = new string(' ', nombreDEspace);
+                                nombreFormate += espaceAAjouter + i;
+                                
                                 compteurPremiers++;
-                                nombresPremiers += (compteurPremiers % 7 == 0) ? $"{i}\n" : $"{i} ";
+                                nombresPremiers += nombreFormate;
                             }
                         }
-
+                        
+                        //Je me suis permis d'ajouter quelque saut de ligne pour améliorer la qualité de l'affichage
                         Console.WriteLine($"{compteurPremiers} nombres premiers de {debut} à {fin} : \n");
                         Console.WriteLine(nombresPremiers);
                         Console.WriteLine();
@@ -376,7 +430,7 @@ q) Quitter";
             bool valide = false;
             while (!valide)
             {
-                Console.Write($"\n{question}");
+                Console.Write($"{question}");
                 string entree = Console.ReadLine();
                 valide = double.TryParse(entree, out double resultat);
                 if (valide) return resultat;
@@ -398,6 +452,7 @@ q) Quitter";
                 }
                 Console.WriteLine(messageErreur);
             }
+            return 0;
         }
 
         static int ParseEntierSecuritaire(string question, string messageErreur)
@@ -414,16 +469,17 @@ q) Quitter";
                 }
                 Console.WriteLine(messageErreur);
             }
+            return 0;
         }
 
         // Parse un entier positif supérieur ou égal à X.
         // Cette fonction est utilisée pour le calcul des nombres premiers et pour toute entrée nécessitant un uint ≥ 0.
         static uint ParseEntierSuperieurOuEgaleAX(string question, string messageErreur, uint x)
-        {   
-            bool valide = false
+        {
+            bool valide = false;
             while (!valide)
             {
-                Console.Write($"\n{question}");
+                Console.Write($"{question}");
                 string entree = Console.ReadLine();
 
                 if (uint.TryParse(entree, out uint valeur))
@@ -437,6 +493,8 @@ q) Quitter";
 
                 Console.WriteLine(messageErreur);
             }
+
+            return 0;
 
         }
     }
