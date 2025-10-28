@@ -292,6 +292,7 @@ q) Quitter";
                         estPremier[0] = false;
                         estPremier[1] = false;
                         uint limite = (uint)Math.Sqrt(fin);
+                        int compt = 0;
 
                         // Crible d'Ératosthène
                         for (uint p = 2; p <= limite; p++)
@@ -299,14 +300,16 @@ q) Quitter";
                             if (estPremier[p])
                             {
                                 //commence a p^2,car p*x | x<p  est déjà un multiple enlevé.
-
+                                
                                 for (uint multiple = p * p; multiple <= fin; multiple += p)
                                 {
                                     estPremier[multiple] = false;
                                 }
                             }
                         }
+                        
 
+                        
                         // Affiche les nombres premiers trouvés
                         int plusGrandNombrePremier = 0;
 
@@ -318,7 +321,7 @@ q) Quitter";
                                 break;
                             }
                         }
-
+                        
                         int espaceMinimal = 2;
                         int espaceDeBalancement = 1;
 
@@ -328,12 +331,12 @@ q) Quitter";
                         //Double pour avoir un double comme reponse et donc que le floor soit utile.
                         int nombresParLigne = (int)Math.Floor(LARGEUR_MAXIMAL_DE_LA_CONSOLE / (double)charParNombre);
                         
-
+                        
                         for (uint i = 0; i <= fin; i++)
                         {
                             if (estPremier[i] && i >= debut)
                             {
-
+                                
                                 string nombreFormate = "";
                                 //Saute une ligne au pour la premiere ligne pour l'esthetique et saute une ligne quand le nombre d'element maximum par ligne est atteint.
                                 if (compteurPremiers % nombresParLigne == 0)
@@ -354,8 +357,13 @@ q) Quitter";
                                 
                                 compteurPremiers++;
                                 nombresPremiers += nombreFormate;
+                                
+
+                                compt++;
                             }
                         }
+
+                        Console.WriteLine(compt);
                         
                         //Je me suis permis d'ajouter quelque saut de ligne pour améliorer la qualité de l'affichage
                         Console.WriteLine($"{compteurPremiers} nombres premiers de {debut} à {fin} : \n");
@@ -363,6 +371,7 @@ q) Quitter";
                         Console.WriteLine();
                         Console.Write("Appuyer sur Entrée pour continuer.\n");
                         Console.ReadLine();
+                        
                     }
 
                     // ----- RECTANGLE ET TRIANGLE -----
